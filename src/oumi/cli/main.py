@@ -26,6 +26,7 @@ from oumi.cli.infer import infer
 from oumi.cli.judge import conversations, dataset, model
 from oumi.cli.launch import cancel, down, status, stop, up, which
 from oumi.cli.launch import run as launcher_run
+from oumi.cli.multi_agents import app as multi_agents_app
 from oumi.cli.train import train
 
 _ASCII_LOGO = r"""
@@ -102,6 +103,13 @@ def get_app() -> typer.Typer:
             "A wrapper for torchrun/accelerate "
             "with reasonable default values for distributed training."
         ),
+    )
+
+    # Add the multi-agent commands
+    app.add_typer(
+        multi_agents_app,
+        name="multi-agents",
+        help="Multi-agent capabilities powered by CAMEL-AI."
     )
 
     app.command(
