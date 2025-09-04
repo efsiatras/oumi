@@ -1,0 +1,50 @@
+# Copyright 2025 - Oumi
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Inference config for DeepSeek R1 using JAX backend.
+#
+# Requirements:
+#   - Install JAX dependencies: `pip install oumi[jax]`
+#   - Log into HF: `huggingface-cli login`
+#   - Request access to DeepSeek R1: https://huggingface.co/deepseek-ai/DeepSeek-R1
+#
+# Usage:
+#   oumi infer -i -c configs/recipes/jax/deepseek_r1_jax_infer.yaml
+#
+# See Also:
+#   - Documentation: https://oumi.ai/docs/en/latest/user_guides/infer/infer.html
+#   - JAX Scaling Book: https://jax-ml.github.io/scaling-book/
+#   - JAX LLM Examples: https://github.com/jax-ml/jax-llm-examples
+#   - Config class: oumi.core.configs.InferenceConfig
+
+model:
+  model_name: "jax-ml/deepseek-r1"
+  model_max_length: 4096  # DeepSeek R1 supports longer contexts
+  torch_dtype_str: "bfloat16"
+  load_pretrained_weights: True
+  trust_remote_code: True
+
+generation:
+  max_new_tokens: 2048
+  temperature: 0.8  # Slightly higher for reasoning tasks
+  top_p: 0.95
+
+engine: JAX
+
+# JAX-specific configuration optimized for DeepSeek R1
+jax:
+  tensor_parallel_size: -1  # Use all available devices
+  quantization: "int8"  # Essential for large models like R1
+  enable_xla_compilation: True
+  memory_fraction: 0.85  # Leave more memory for reasoning computations

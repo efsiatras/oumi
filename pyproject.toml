@@ -141,6 +141,15 @@ gcp = [
 lambda = ["skypilot[lambda]"]
 runpod = ["skypilot[runpod]"]
 
+# JAX dependencies for high-performance inference
+jax = [
+    "jax>=0.7.0",                     # JAX with CPU and GPU support (requires Python 3.11+)
+    "jaxlib>=0.7.0",                  # JAX backend library (requires Python 3.11+)
+    "orbax-checkpoint>=0.4.0",        # Checkpoint utilities
+    "tpu-info",                       # TPU information utilities
+]
+
+
 synthesis = [
     "pdftext>=0.6.3", # Document ingestion for synthesis
 ]
@@ -276,4 +285,6 @@ markers = [
     "e2e_eternal: Extremely slow e2e integration tests (for manual/selective runs)",
     "single_gpu: The test uses max 1 GPU (can be potentially skipped on multi-GPU machine to conserve GPU resources)",
     "multi_gpu: The test should run on a machine with multiple GPU-s",
+    "jax: Tests that require JAX and jax-llm-examples",
+    "tpu: Tests that require TPU hardware",
 ]

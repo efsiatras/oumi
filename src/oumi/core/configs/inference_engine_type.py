@@ -62,3 +62,6 @@ class InferenceEngineType(str, Enum):
 
     SAMBANOVA = "SAMBANOVA"
     """The inference engine for SambaNova API."""
+
+    JAX = "JAX"
+    """The JAX inference engine for high-performance JAX models."""

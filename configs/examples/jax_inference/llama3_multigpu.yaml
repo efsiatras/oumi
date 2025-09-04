@@ -1,0 +1,77 @@
+# Copyright 2025 - Oumi
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Multi-GPU JAX inference config for Llama 3 8B with tensor parallelism.
+# Distributes model across multiple GPUs for higher throughput.
+#
+# ⚠️ Experimental: JAX backend is under active development
+#
+# Requirements:
+#   - Install JAX dependencies: `pip install "oumi[jax]"`
+#   - 2-4 GPUs with NVLink recommended
+#   - NCCL for multi-GPU communication
+#
+# Usage:
+#   # Launch with multiple GPUs
+#   CUDA_VISIBLE_DEVICES=0,1,2,3 oumi infer -i -c configs/examples/jax_inference/llama3_multigpu.yaml
+#
+# Performance:
+#   - Throughput: ~4x improvement with 4 GPUs
+#   - Latency: Similar to single GPU
+#   - Memory: Distributed across GPUs
+
+model:
+  model_name: "meta-llama/Llama-3.1-8B-Instruct"
+  model_max_length: 8192
+  torch_dtype_str: "bfloat16"
+  load_pretrained_weights: true
+  trust_remote_code: true
+
+generation:
+  max_new_tokens: 2048
+  temperature: 0.7
+  top_p: 0.9
+  do_sample: true
+
+engine: JAX
+
+jax_config:
+  # Tensor parallelism configuration
+  parallel_strategy: "tensor_parallel"
+
+  # Number of devices to use (auto-detected if not specified)
+  num_devices: 4
+
+  # Mesh configuration for sharding
+  mesh_shape: [1, 4, 1]  # [batch, tensor, pipeline]
+  mesh_axes: ["batch", "tensor", "pipeline"]
+
+  # Sharding rules for model parameters
+  sharding_rules:
+    embed: ["tensor", null]
+    mlp: ["null", "tensor"]
+    attention: ["tensor", null]
+
+  # Enable XLA fusion across devices
+  enable_xla: true
+  cross_device_fusion: true
+
+  # NCCL configuration for multi-GPU communication
+  collective_backend: "nccl"
+
+  # Memory management
+  memory_fraction: 0.9
+
+  # Use distributed attention kernels
+  use_distributed_attention: true
